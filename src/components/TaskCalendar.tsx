@@ -2,6 +2,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
+import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useTaskContext, Task } from "@/context/TaskContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
@@ -11,7 +12,7 @@ import { Card } from "./ui/card";
 
 // Define the date formatting functions needed for the calendar
 const locales = {
-  "en-US": require("date-fns/locale/en-US"),
+  "en-US": enUS,
 };
 
 // Create a wrapper function for date-fns since react-big-calendar expects moment.js
