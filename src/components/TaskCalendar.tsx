@@ -1,7 +1,7 @@
 
 import { useState, useCallback, useMemo } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import { format, parse, startOfWeek, getDay } from "date-fns";
+import { Calendar } from "react-big-calendar";
+import { format, parse, startOfWeek, getDay, addMinutes } from "date-fns";
 import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useTaskContext, Task } from "@/context/TaskContext";
@@ -10,39 +10,46 @@ import { TaskForm } from "./TaskForm";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
 
-// Define the date formatting functions needed for the calendar
+// Define a proper localizer using date-fns
 const locales = {
-  "en-US": enUS,
+  'en-US': enUS,
 };
 
-// Create a wrapper function for date-fns since react-big-calendar expects moment.js
-const localizer = {
-  format: (date: Date, format: string) => {
-    return format === "LT" 
-      ? formatDate(date, "h:mm a") 
-      : format === "llll" 
-        ? formatDate(date, "EEE MMM d, yyyy h:mm a") 
-        : formatDate(date, format);
-  },
-  parse: (str: string, format: string) => {
-    return parse(str, format, new Date());
-  },
-  startOfWeek: (date: Date) => {
-    return startOfWeek(date);
-  },
-  getDay: (date: Date) => {
-    return getDay(date);
-  },
-  locales,
+// Helper to create a proper date-fns localizer for react-big-calendar
+const dateFnsLocalizer = () => {
+  return {
+    format: (date: Date, formatStr: string) => {
+      return format(date, formatStr, { locale: locales['en-US'] });
+    },
+    parse: (str: string, formatStr: string) => {
+      return parse(str, formatStr, new Date(), { locale: locales['en-US'] });
+    },
+    startOfWeek: (date: Date) => {
+      return startOfWeek(date, { locale: locales['en-US'] });
+    },
+    getDay: (date: Date) => {
+      return getDay(date);
+    },
+    formats: {
+      dateFormat: 'dd',
+      dayFormat: 'dd eee',
+      weekdayFormat: 'eee',
+      monthHeaderFormat: 'MMMM yyyy',
+      dayHeaderFormat: 'cccc MMM d',
+      dayRangeHeaderFormat: ({ start, end }: { start: Date; end: Date }) => 
+        `${format(start, 'MMM d', { locale: locales['en-US'] })} - ${format(end, 'MMM d', { locale: locales['en-US'] })}`,
+      timeGutterFormat: 'HH:mm',
+      agendaDateFormat: 'ccc MMM dd',
+      agendaTimeFormat: 'HH:mm',
+      agendaTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) =>
+        `${format(start, 'HH:mm', { locale: locales['en-US'] })} - ${format(end, 'HH:mm', { locale: locales['en-US'] })}`,
+    },
+    locales,
+  };
 };
 
-// Helper function to use date-fns format
-function formatDate(date: Date, formatStr: string) {
-  return format(date, formatStr);
-}
-
-// Create a custom localizer for react-big-calendar using date-fns
-const dateLocalizer = momentLocalizer(localizer as any);
+// Create localizer instance
+const localizer = dateFnsLocalizer();
 
 // Define view constants
 const VIEWS = {
@@ -159,7 +166,7 @@ export function TaskCalendar() {
     <div className="h-[calc(100vh-12rem)]">
       <Card className="p-4 h-full">
         <Calendar
-          localizer={dateLocalizer}
+          localizer={localizer}
           events={events}
           startAccessor="start"
           endAccessor="end"
