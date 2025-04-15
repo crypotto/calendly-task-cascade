@@ -52,6 +52,16 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				priority: {
+					low: '#D6BCFA',
+					medium: '#9b87f5',
+					high: '#7E69AB'
+				},
+				task: {
+					pending: '#F2FCE2',
+					inProgress: '#FEF7CD',
+					completed: '#E5DEFF'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
